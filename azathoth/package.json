@@ -1,0 +1,16 @@
+{
+  "name": "@agent-k/azathoth",
+  "version": "1.0.0",
+  "description": "Atom Manager and Registry for Agent K",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  }
+}

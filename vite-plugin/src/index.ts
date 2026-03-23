@@ -36,7 +36,8 @@ export default function AgentF(): PluginOption {
           import React from 'react';
           import { createRoot } from 'react-dom/client';
           import { TentaclesOverlay, Artboard, DraggableWindow } from '@agent-k/tentacles';
-          import { EyeTerminal, AIPanel } from '@agent-k/eyes';
+          import { AIPanel } from '@agent-k/eyes';
+          import { GladiusTerminal } from '@agent-k/gladius';
           import { WebSocketFileSystem } from '${process.cwd()}/libs/vite-plugin/src/client/ws-fs.ts'; // Direct import for dev
           
           console.log('[Agent K] Client Booting...');
@@ -64,7 +65,7 @@ export default function AgentF(): PluginOption {
                // 3. Terminal Window
                React.createElement(DraggableWindow, { title: 'TERMINAL', initialX: window.innerWidth - 620, initialY: window.innerHeight - 320 },
                  React.createElement('div', { style: { background: 'black', height: '100%'} },
-                    React.createElement(EyeTerminal)
+                    React.createElement(GladiusTerminal)
                  )
                )
              );
