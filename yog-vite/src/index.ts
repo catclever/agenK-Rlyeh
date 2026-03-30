@@ -3,7 +3,7 @@ import { setupWebSocket } from './server/ws-handler';
 
 export default function AgentF(): PluginOption {
   return {
-    name: 'vite-plugin-agent-k',
+    name: 'yog-vite-plugin',
     configureServer(server) {
       setupWebSocket(server);
     },
@@ -38,7 +38,7 @@ export default function AgentF(): PluginOption {
           import { TentaclesOverlay, Artboard, DraggableWindow } from '@agent-k/tentacles';
           import { AIPanel } from '@agent-k/eyes';
           import { GladiusTerminal } from '@agent-k/gladius';
-          import { WebSocketFileSystem } from '${process.cwd()}/libs/vite-plugin/src/client/ws-fs.ts'; // Direct import for dev
+          import { WebSocketFileSystem } from '${process.cwd()}/libs/yog-vite/src/client/ws-fs.ts'; // Direct import for dev
           
           console.log('[Agent K] Client Booting...');
           

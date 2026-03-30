@@ -1,5 +1,5 @@
 {
-  "name": "@agent-k/vite-plugin",
+  "name": "@agent-k/yog-vite",
   "version": "0.0.1",
   "type": "module",
   "main": "./dist/index.js",

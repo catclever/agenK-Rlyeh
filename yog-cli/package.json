@@ -1,10 +1,10 @@
 {
-  "name": "@agent-k/cli",
+  "name": "@agent-k/yog-cli",
   "version": "1.0.0",
   "description": "Agent K CLI Injector",
   "type": "module",
   "bin": {
-    "agenk": "dist/index.js"
+    "yog": "dist/index.js"
   },
   "scripts": {
     "build": "tsc"
