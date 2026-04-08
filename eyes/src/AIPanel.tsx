@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useKernelApi } from '@agent-k/core';
 import { sendMessage } from './llm/client';
 import type { Message } from './llm/client';
 import type { IFileSystem } from './fs/FileSystem';
@@ -15,9 +16,15 @@ export const AIPanel: React.FC<AIPanelProps> = ({ fileSystem }) => {
   const [input, setInput] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Resolve Gladius Plugin via Kernel Bus
+  const gladiusApi = useKernelApi('gladius');
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current && messagesEndRef.current.parentElement) {
+      const parent = messagesEndRef.current.parentElement;
+      parent.scrollTop = parent.scrollHeight;
+    }
   };
 
   useEffect(scrollToBottom, [messages]);
@@ -129,12 +136,12 @@ export const AIPanel: React.FC<AIPanelProps> = ({ fileSystem }) => {
         <div ref={messagesEndRef} />
       </div>
       <div className="ai-input-area">
-        <div className="ai-input-wrapper">
+        <div className="ai-input-wrapper relative">
           <textarea 
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask Agent K..."
+            placeholder={gladiusApi ? "Ask Agent K (Terminal is Attached/Ready)..." : "Ask Agent K (Terminal Module Offline)..."}
           />
           <div className="ai-footer-actions">
             <span style={{ fontSize: 12, color: '#999' }}>⏎ to send</span>

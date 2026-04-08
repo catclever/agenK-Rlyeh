@@ -1,6 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
+import { useKernelRegister } from '@agent-k/core';
+import type { TerminalApi } from '@agent-k/core';
 import 'xterm/css/xterm.css';
 
 interface GladiusTerminalProps {
@@ -11,9 +13,15 @@ interface GladiusTerminalProps {
 export const GladiusTerminal: React.FC<GladiusTerminalProps> = ({ onTerminalReady, className }) => {
   const terminalRef = useRef<HTMLDivElement>(null);
   const termInstance = useRef<Terminal | null>(null);
+  const [terminalApi, setTerminalApi] = useState<TerminalApi | undefined>(undefined);
+
+  // Register this component's capabilities natively to the IDE Kernel Bus
+  useKernelRegister('gladius', terminalApi as any);
 
   useEffect(() => {
     if (!terminalRef.current || termInstance.current) return;
+    let ro: ResizeObserver | null = null;
+    let handleResizeGlobal: (() => void) | null = null;
 
     const initTerminal = () => {
       if (!terminalRef.current) return;
@@ -46,23 +54,51 @@ export const GladiusTerminal: React.FC<GladiusTerminalProps> = ({ onTerminalRead
       }
       
       termInstance.current = term;
+      
+      // Expose capabilities to other decoupled modules
+      setTerminalApi({
+        executeCommand: (cmd: string) => {
+          // For now, write to terminal UI. Real execution relies on the Shoggoth Orchestrator bindings.
+          // The Orchestrator intercepts this later, but for UI feedback:
+          term.write(`\r\n\x1b[33m$ ${cmd}\x1b[0m\r\n`);
+          // Dispatch DOM custom event so IDE catches actual backend runner 
+          window.dispatchEvent(new CustomEvent('GLADIUS_EVAL', { detail: cmd }));
+        },
+        write: (text: string) => term.write(text)
+      });
+
       if (onTerminalReady) onTerminalReady(term);
 
       const handleResize = () => {
         try {
-          fitAddon.fit(); 
+          if (terminalRef.current && terminalRef.current.clientWidth > 0) {
+             fitAddon.fit(); 
+          }
         } catch (e) {
           // Ignore visual resize errors
         }
       };
+      
       window.addEventListener('resize', handleResize);
+      handleResizeGlobal = handleResize;
+      
+      if (typeof ResizeObserver !== 'undefined' && terminalRef.current) {
+         ro = new ResizeObserver(() => {
+            handleResize();
+         });
+         ro.observe(terminalRef.current);
+      }
     };
 
     // Start init loop
     requestAnimationFrame(initTerminal);
 
     return () => {
-      // window.removeEventListener('resize', handleResize); // hard to remove inner function, leak is minor for this singleton
+      if (handleResizeGlobal) window.removeEventListener('resize', handleResizeGlobal);
+      if (ro) {
+        ro.disconnect();
+        ro = null;
+      }
       if (termInstance.current) {
         termInstance.current.dispose();
         termInstance.current = null;
