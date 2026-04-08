@@ -1,13 +1,19 @@
 {
   "name": "@agent-k/azathoth",
   "version": "1.0.0",
-  "description": "Atom Manager and Registry for Agent K",
+  "description": "Atom Manager, Registry, and CLI Molter for Agent K",
   "main": "src/index.ts",
+  "bin": {
+    "azathoth": "dist/cli.js"
+  },
+  "type": "module",
   "scripts": {
     "build": "tsc"
   },
   "dependencies": {
-    "react": "^18.3.1",
+    "commander": "^12.1.0",
+    "glob": "^11.1.0",
+    "react": ">=18.0.0",
     "react-dom": "^18.3.1"
   },
   "peerDependencies": {
