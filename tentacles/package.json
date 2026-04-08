@@ -3,13 +3,13 @@
   "private": false,
   "version": "0.0.1",
   "type": "module",
-  "main": "./dist/hand.umd.cjs",
-  "module": "./dist/hand.js",
+  "main": "./dist/tentacles.umd.cjs",
+  "module": "./dist/tentacles.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/hand.js",
-      "require": "./dist/hand.umd.cjs"
+      "import": "./dist/tentacles.js",
+      "require": "./dist/tentacles.umd.cjs"
     }
   },
   "scripts": {

@@ -32,9 +32,6 @@ export const TentaclesOverlay: React.FC<TentaclesOverlayProps> = ({ targetId, sc
         zoom={scale}
         draggable={true}
         throttleDrag={1}
-        edgeDraggable={false}
-        startDragRotate={0}
-        throttleDragRotate={0}
         resizable={true}
         keepRatio={false}
         throttleResize={1}
@@ -62,15 +59,21 @@ export const TentaclesOverlay: React.FC<TentaclesOverlayProps> = ({ targetId, sc
            if (!targetId) return;
            e.target.style.width = `${e.width}px`;
            e.target.style.height = `${e.height}px`;
-           e.target.style.left = `${e.drag.left}px`;
-           e.target.style.top = `${e.drag.top}px`;
+           
+           // Moveable 0.54+ exposes e.drag.left, but if missing (NaN/undefined during matrix rotations)
+           // we securely compute absolute screen drift via the mathematical beforeTranslate delta matrix.
+           const newX = e.drag.left !== undefined ? e.drag.left : (geometryRef.current.x + e.drag.beforeTranslate[0]);
+           const newY = e.drag.top !== undefined ? e.drag.top : (geometryRef.current.y + e.drag.beforeTranslate[1]);
+           
+           e.target.style.left = `${newX}px`;
+           e.target.style.top = `${newY}px`;
            
            geometryRef.current = { 
              ...geometryRef.current, 
              width: e.width, 
              height: e.height, 
-             x: e.drag.left, 
-             y: e.drag.top 
+             x: newX, 
+             y: newY 
            };
         }}
         onResizeEnd={(e: any) => {
@@ -81,9 +84,14 @@ export const TentaclesOverlay: React.FC<TentaclesOverlayProps> = ({ targetId, sc
 
         onRotate={(e: any) => {
            if (!targetId) return;
-           e.target.style.transform = e.drag.transform;
            
-           geometryRef.current = { ...geometryRef.current, rotation: e.rotation };
+           // Extract the definitive absolute angle Moveable mathematically tracked
+           const newRotation = e.absoluteRotation ?? 0;
+           
+           // STRCITLY ISOLATE THE DOM MUTATION TO ONLY ROTATE - NO TRANSLATE POISONING
+           e.target.style.transform = `rotate(${newRotation}deg)`;
+           
+           geometryRef.current = { ...geometryRef.current, rotation: newRotation };
         }}
         onRotateEnd={(e: any) => {
            if (!targetId || !e.isDrag) return;

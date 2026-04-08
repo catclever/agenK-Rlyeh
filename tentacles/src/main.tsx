@@ -5,11 +5,10 @@ import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <TentaclesOverlay 
-      components={[]} 
-      scale={1} 
-      onUpdate={() => {}} 
-      onSelect={() => {}} 
-    />
+      <TentaclesOverlay 
+        targetId={null}
+        scale={1} 
+        onUpdate={() => {}}
+      />
   </React.StrictMode>,
 )
